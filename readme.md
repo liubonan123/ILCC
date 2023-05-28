@@ -40,7 +40,7 @@ These features are implemented for VLP-16, HDL-32e and HDL-64e. However, they te
     - Add sample data and results for perspective camera calibration.
     - Add a feature that can hide occluded parts by the chessboard when project the point cloud to the image.
     - Some other minor changes. 
-
+* 2023-05-28 Add corner estimation file for Livox mid360
 
 ## Dependencies (Tested on macOS sierra and Ubuntu 14.04/16.04)
 * Python >= 2.7.9
