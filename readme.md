@@ -1,23 +1,4 @@
-# 3D-LiDAR and camera extrinsic calibration [[paper](http://www.mdpi.com/2072-4292/9/8/851/htm)][[arxiv](https://arxiv.org/abs/1708.05514)]
-<!-- based on reflectance intensity of the laser -->
-
-[![License](https://img.shields.io/badge/license-BSD-blue.svg)](LICENSE) 
-
-## Citation
-If you find our codes and method useful to your work, please consider citing this work:
-
-    @Article{WANG2017Lidar_camera_cali,
-    AUTHOR = {Wang, Weimin and Sakurada, Ken and Kawaguchi, Nobuo},
-    TITLE = {Reflectance Intensity Assisted Automatic and Accurate Extrinsic Calibration of 3D LiDAR and Panoramic Camera Using a Printed Chessboard},
-    JOURNAL = {Remote Sensing},
-    VOLUME = {9},
-    YEAR = {2017},
-    NUMBER = {8},
-    ARTICLE-NUMBER = {851},
-    ISSN = {2072-4292},
-    DOI = {10.3390/rs9080851}
-    }
-
+# 3D-LiDAR and camera extrinsic calibration 
 ## Introduction
 
 <!-- [[paper]](http://www.mdpi.com/journal/remotesensing)-->
