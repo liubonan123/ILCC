@@ -68,7 +68,7 @@ class jdc_segment:
     def calc_integrate_len(self):
         points_num = self.points_xyz.shape[0]
         total_length = 0
-        for i in xrange(points_num - 1):
+        for i in range(points_num - 1):
             total_length = total_length + LA.norm(self.points_xyz[i] - self.points_xyz[i + 1])
         return total_length
 
@@ -126,7 +126,7 @@ class jdc_segments_collection:
     def is_point_in_plane(self, points_arr):
         planes_num = len(self.__normals_list)
         result = False
-        for i in xrange(planes_num):
+        for i in range(planes_num):
             plane_normal = self.__normals_list[i]
             error = abs(np.asmatrix(np.array(plane_normal)[:3]) * points_arr.T + plane_normal[3]).mean()
             # print error
@@ -139,12 +139,12 @@ class jdc_segments_collection:
     def exact_planar_normals(self):
         import pcl
         if self.__csv_path == "":
-            print "csv file path is not spcified!"
+            print("csv file path is not spcified!")
         raw_data = np.genfromtxt(self.__csv_path, delimiter=",", skip_header=1)
         points_xyz_arr = np.array(raw_data[:, :3], dtype=np.float32)
         points_cloud = pcl.PointCloud()
         points_cloud.from_array(points_xyz_arr)
-        for i in xrange(self.__palnar_normal_num):
+        for i in range(self.__palnar_normal_num):
             seg = points_cloud.make_segmenter()
             seg.set_optimize_coefficients(True)
             seg.set_model_type(pcl.SACMODEL_PLANE)
@@ -166,9 +166,9 @@ class jdc_segments_collection:
         with open(self.__csv_path) as f:
             first_line = f.readline()
         header_itmes = first_line.split(",")
-        for i in xrange(len(header_itmes)):
+        for i in range(len(header_itmes)):
             if header_itmes[i].find("laser_id") > -1:
-                print "laser_id is found in ", i, "-th colunm!"
+                print("laser_id is found in {}-th colunm!".format(i))
                 laser_id_col_ind = i
                 break
         else:
@@ -183,7 +183,7 @@ class jdc_segments_collection:
 
         l = self.l
 
-        for m in xrange(l):
+        for m in range(l):
             order = np.where(raw_data[:, laser_id_col_ind] == m)  # the 4-th column means the laser id
             temp_data = raw_data[order[0]][:, :3]  # exact XYZ data with laser_id=i
             data_arr_by_id_list = temp_data
@@ -194,7 +194,7 @@ class jdc_segments_collection:
             first_jdc = -1
             least_points_num = 0
 
-            for i in xrange(total_points_num):
+            for i in range(total_points_num):
                 #                 print i
                 a = data_arr_by_id_list[i, :]
                 if i < total_points_num - 1:
@@ -235,7 +235,7 @@ class jdc_segments_collection:
 
     def return_potential_seg(self):
         pot_seg = list()
-        for i in xrange(len(self.segs_list)):
+        for i in range(len(self.segs_list)):
             tmp = self.segs_list[i]
             if tmp.is_potential:
                 tmp.points_rgb = np.array([255, 0, 0])
@@ -244,7 +244,7 @@ class jdc_segments_collection:
 
     def cluster_seg(self):
         clustered_list = list()
-        print "jdc number: ", len(self.segs_list)
+        print("jdc number: {}".foramt(len(self.segs_list)))
         copy_segs_list = copy.deepcopy(self.segs_list)
         z_list = []
         for segs in copy_segs_list:
@@ -292,7 +292,7 @@ class jdc_segments_collection:
             if len(clustered_seg) > 0:
                 clustered_list.append(clustered_seg)
             searchlist.remove(searchlist[-1])
-        print "seg_co was segmented into " + str(len(clustered_list))
+        print("seg_co was segmented into " + str(len(clustered_list)))
         return clustered_list
 
 
@@ -333,7 +333,7 @@ def calc_pca_correlation(a, b):
         #         print pca_b.components_
         sim_r = norm(pca_a.explained_variance_ratio_ - pca_b.explained_variance_ratio_)
         sim_b = 0
-        for i in xrange(3):
+        for i in range(3):
             sim_b = sim_b + abs((pca_a.explained_variance_ratio_[i] + pca_b.explained_variance_ratio_[i]) / 2 * (
                 np.dot(pca_a.components_[i], pca_b.components_[i])) / (
                                         norm(pca_a.components_[i]) * norm(pca_b.components_[i])))
@@ -362,7 +362,7 @@ def calc_vectors_pca_correlation(a, b):
         #         print pca_b.components_
         sim_r = norm(pca_a.explained_variance_ratio_ - pca_b.explained_variance_ratio_)
         sim_b = 0
-        for i in xrange(3):
+        for i in range(3):
             sim_b = sim_b + abs((pca_a.explained_variance_ratio_[i] + pca_b.explained_variance_ratio_[i]) / 2 * (
                 np.dot(pca_a.components_[i], pca_b.components_[i])) / (
                                         np.linalg.norm(pca_a.components_[i]) * np.linalg.norm(pca_b.components_[i])))
@@ -387,7 +387,7 @@ if debug:
         Points = vtk.vtkPoints()
         Vertices = vtk.vtkCellArray()
 
-        for k in xrange(all_rows):
+        for k in range(all_rows):
             point = array_data[k, :]
             id = Points.InsertNextPoint(point[0], point[1], point[2])
             Vertices.InsertNextCell(1)
@@ -443,7 +443,7 @@ def is_marker(file_full_path, range_res, points_num_th=250):
     jdcs_collection = cPickle.load(open(file_full_path, 'rb'))
 
     if debug:
-        print file_full_path
+        print(file_full_path)
     tmp_list = list()
     for jdc in jdcs_collection:
         tmp_list.extend(jdc)
@@ -452,14 +452,14 @@ def is_marker(file_full_path, range_res, points_num_th=250):
         show_pcd_ndarray(arr)
     if arr.shape[0] < points_num_th:
         if debug:
-            print "points num: ", arr.shape[0]
+            print("points num: {}".format(arr.shape[0]))
         return False
 
     # use the distance between the marker's center and the lidar to filter
     avg = arr.mean(axis=0)
     if np.linalg.norm(avg) > range_res:
         if debug:
-            print "avg: ", np.linalg.norm(avg)
+            print("avg: {}".format(np.linalg.norm(avg)))
         return False
 
     # check whether is a plane
@@ -467,7 +467,7 @@ def is_marker(file_full_path, range_res, points_num_th=250):
     pca.fit(arr)
     if pca.explained_variance_ratio_[2] > params['chessboard_detect_planar_PCA_ratio']:
         if debug:
-            print "pca: ", pca.explained_variance_ratio_
+            print("pca: {}".format(pca.explained_variance_ratio_))
         return False
 
     # map to 2D
@@ -479,7 +479,7 @@ def is_marker(file_full_path, range_res, points_num_th=250):
 
     bbx = points.max(axis=0) - points.min(axis=0)
     if debug:
-        print "bbx: ", bbx
+        print("bbx: {}".format(bbx))
 
     if (marker_th_l_min < bbx[0] < marker_th_l_max and marker_th_s_min < bbx[1] < marker_th_s_max) or (
             marker_th_s_min < bbx[0] < marker_th_s_max and marker_th_l_min < bbx[1] < marker_th_l_max):
@@ -488,9 +488,9 @@ def is_marker(file_full_path, range_res, points_num_th=250):
         y_lin = [points.min(axis=0)[1], (points.min(axis=0)[1] + points.max(axis=0)[1]) / 2, points.max(axis=0)[1]]
 
         num_in_quadrant_ls = []
-        for i in xrange(2):
+        for i in range(2):
             x_prd = [x_lin[i], x_lin[i + 1]]
-            for j in xrange(2):
+            for j in range(2):
                 y_prd = [y_lin[j], y_lin[j + 1]]
                 num_in_quadrant_ls.append(np.count_nonzero(
                     (points[:, 0] >= x_prd[0]) & (points[:, 0] <= x_prd[1]) & (points[:, 1] >= y_prd[0]) & (
@@ -498,9 +498,9 @@ def is_marker(file_full_path, range_res, points_num_th=250):
         normed = np.array(num_in_quadrant_ls, dtype=np.float32) / sum(num_in_quadrant_ls)
 
         if normed.max() - normed.min() < 0.15:
-            print file_full_path
-            print "passed"
-            print "pca: ", pca.explained_variance_ratio_
+            print(file_full_path)
+            print("passed")
+            print("pca: {}".format(pca.explained_variance_ratio_))
             if debug:
                 show_pcd_ndarray(arr)
             return True
@@ -520,27 +520,27 @@ def find_marker(file_path, csv_path, range_res=params['marker_range_limit']):
         if is_marker(file_path + file, range_res):
             # print file
             res_ls.append(file_path + file)
-    print len(res_ls)
+    print(len(res_ls))
     if len(res_ls) == 0:
         AssertionError("no marker is found")
     if len(res_ls) > 1:
-        print "one than one candicate of the marker is found!"
-        print res_ls
-        print "The segment with most uniform intensity distribution is considered as the marker"
+        print("one than one candicate of the marker is found!")
+        print(res_ls)
+        print("The segment with most uniform intensity distribution is considered as the marker")
         num_ls = []
         for file in res_ls:
             arr = exact_full_marker_data(csv_path, [file])
             intensity_arr = arr[:, 3]
             hist, bin_edges = np.histogram(intensity_arr, 100)
             if debug:
-                print hist, bin_edges
+                print(hist, bin_edges)
             num_ls.append(len(np.nonzero(hist)[0]))
         res_ls = [res_ls[np.argmax(num_ls)]]
         if debug:
-            print res_ls
+            print(res_ls)
 
     assert len(res_ls) == 1
-    print "marker is found!"
+    print("marker is found!")
     return res_ls
 
 
@@ -555,7 +555,7 @@ def exact_full_marker_data(csv_path, marker_pkl):
 
     tree = spatial.KDTree(all_data_arr[:, :3])
     marker_full_data_ls = []
-    for i in xrange(marker_pcd_arr.shape[0]):
+    for i in range(marker_pcd_arr.shape[0]):
         ret = tree.query(marker_pcd_arr[i])
         marker_full_data_ls.append(all_data_arr[ret[1]])
 
@@ -575,7 +575,7 @@ def get_plane_model(arr):
     seg.set_max_iterations(10000)
     seg.set_distance_threshold(ransac_distance_threshold)
     indices, model = seg.segment()
-    print "percentage of points in plane model: ", np.float32(len(indices)) / arr.shape[0]
+    print("percentage of points in plane model: {}".format(np.float32(len(indices)) / arr.shape[0]))
     return model
 
 
@@ -688,8 +688,8 @@ def cost_func_for_opt_mini(theta_t, transed_pcd, marker_full_data_arr, gray_zone
 def generate_grid_coords(x_res=marker_size[0], y_res=marker_size[1], grid_len=params['grid_length']):  # res, resolution
 
     ls = []
-    for i in xrange(x_res):
-        for j in xrange(y_res):
+    for i in range(x_res):
+        for j in range(y_res):
             orig = np.array([i, j, 0]) * grid_len - np.array([x_res, y_res, 0]) * grid_len / 2
             p1 = np.array([i + 1, j, 0]) * grid_len - np.array([x_res, y_res, 0]) * grid_len / 2
             p2 = np.array([i, j + 1, 0]) * grid_len - np.array([x_res, y_res, 0]) * grid_len / 2
@@ -714,7 +714,7 @@ def get_gray_thre(intes_arr):
     gmm = get_gmm_para(np.expand_dims(intes_arr, axis=1))
     tmp_thres = gmm.means_.mean()
     if gray_zone_debug:
-        print "Mean of intensity by GMM: ", tmp_thres
+        print("Mean of intensity by GMM: {}".format(tmp_thres))
 
     hist, bin_edges = np.histogram(intes_arr, 100)
     if gray_zone_debug:
@@ -740,8 +740,8 @@ def get_gray_thre(intes_arr):
         if high_found and low_found:
             break
     else:
-        print "gray zone is not well detected!"
-        print low_intensity, high_intensity
+        print("gray zone is not well detected!")
+        print(low_intensity, high_intensity)
 
     return low_intensity, high_intensity
 
@@ -754,7 +754,7 @@ def seg_pcd(csv_path, save_folder_path):
     seg_count = 0
     jdc_collection = jdc_segments_collection()
     jdc_collection.set_csv_path(csv_path)
-    print "csv_file loaded!"
+    print("csv_file loaded!")
     jdc_collection.get_potential_segments()
 
     clustered_seg_list = jdc_collection.cluster_seg()
@@ -765,7 +765,7 @@ def seg_pcd(csv_path, save_folder_path):
         potential_seg_co_list.append(tmp_seg_co)
     twice_clustered_seg_list = clustered_seg_list
 
-    print "twice_clustered_seg num=" + str(len(twice_clustered_seg_list))
+    print("twice_clustered_seg num=" + str(len(twice_clustered_seg_list)))
 
     parts = csv_path.split("/")
     if os.path.isdir(save_folder_path + parts[-1].split(".")[0]):
@@ -778,10 +778,10 @@ def seg_pcd(csv_path, save_folder_path):
             count_after_filter += 1
             list_for_pedestrians_pcd = list()
             list_for_jdcs = list()
-            for j in xrange(len(tmp_seg_co)):
+            for j in range(len(tmp_seg_co)):
                 tmp_seg = tmp_seg_co[j]
                 list_for_jdcs.append(tmp_seg.points_xyz.tolist())
-                for k in xrange(tmp_seg.points_xyz.shape[0]):
+                for k in range(tmp_seg.points_xyz.shape[0]):
                     point = tmp_seg.points_xyz[k, :]
                     list_for_pedestrians_pcd.append(point)
             arr_for_pedestrians_pcd = np.asarray(list_for_pedestrians_pcd, dtype=np.float32)
@@ -809,10 +809,10 @@ def opt_min(param_ls, initial_guess=np.zeros(3).tolist()):
         res = minimize(cost_func_for_opt_mini, initial_guess, args=param_ls[1],
                        method=method, tol=1e-10, options={"maxiter": 10000000})  # , "disp": True
 
-        print method, ": ", res.fun, "  ", res.x
+        print(method, ": ", res.fun, "  ", res.x)
         return res.fun, [method, res]
     except:
-        print method, ": could not be applied"
+        print(method, ": could not be applied")
         return None
 
 
@@ -847,7 +847,7 @@ def run(csv_path, save_folder_path=os.path.join(params['base_dir'], "output/pcd_
     # calculate the rotate angle in xoy palne around the z axis
     if 1:
         low_intes, high_intens = get_gray_thre(marker_full_data_arr_fitted[:, params['intensity_col_ind']])
-        print "low_intes,high_intes:", low_intes, high_intens
+        print("low_intes: {}, high_intes: {}", low_intes, high_intens)
         rate = 2
         gray_zone = np.array([((rate - 1) * low_intes + high_intens), (low_intes + (rate - 1) * high_intens)]) / rate
 
@@ -864,8 +864,8 @@ def run(csv_path, save_folder_path=os.path.join(params['base_dir'], "output/pcd_
 
         res = res_dict[min(res_dict)][1]
 
-        print res_dict[min(res_dict)][0]
-        print res
+        print(res_dict[min(res_dict)][0])
+        print(res)
 
         rot2 = transforms3d.axangles.axangle2mat([0, 0, 1], res.x[0])
         t2 = np.array([res.x[1], res.x[2], 0])
@@ -884,21 +884,19 @@ def run(csv_path, save_folder_path=os.path.join(params['base_dir'], "output/pcd_
 # for multiple  processing
 def main_for_pool(i):
     pcd_file = os.path.join(params['base_dir'], "pcd/") + str(i).zfill(params["file_name_digits"]) + ".csv"
-    print pcd_file
+    print(pcd_file)
     try:
         result = run(csv_path=pcd_file)
-        print result
+        print(result)
         save_file_path = os.path.join(params['base_dir'], "output/pcd_seg/") + str(i).zfill(
             params["file_name_digits"]) + "_pcd_result.pkl"
         with open(os.path.abspath(save_file_path), 'w') as file:
             file.truncate()
             cPickle.dump(result, file)
-        print "pkl file was saved to " + save_file_path + " successfully!"
-        print
-        print
+        print("pkl file was saved to " + save_file_path + " successfully!")
     except AssertionError:
-        print "marker cannot be found"
-        print "skip " + pcd_file
+        print("marker cannot be found")
+        print("skip " + pcd_file)
 
 
 # main function for detecting corners from pcd files in the folder

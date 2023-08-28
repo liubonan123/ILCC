@@ -71,18 +71,18 @@ def xyz2angle(pcd):
 
 def convert2_ang_cm(ls):
     ret = []
-    for i in xrange(3):
+    for i in range(3):
         ret.append(np.rad2deg(ls[i]))
-    for i in xrange(3):
+    for i in range(3):
         ret.append(ls[3 + i] * 100)
     return ret
 
 
 def convert2_rad_m(ls):
     ret = []
-    for i in xrange(3):
+    for i in range(3):
         ret.append(np.deg2rad(ls[i]))
-    for i in xrange(3):
+    for i in range(3):
         ret.append(ls[3 + i] / 100)
     return ret
 
@@ -118,7 +118,7 @@ def calc_inintial_guess(corners_in_img_arr, corners_in_pcd_arr, method="UPNP"):
     else:
         raise Exception("Opengv method error!")
 
-    print "initial guess by relative pose: ", transformation
+    print("initial guess by relative pose: {}".format(transformation))
     # print ransac_transformation
     angs = rotationMatrixToEulerAngles(transformation[:3, :3].T).tolist()
     ret = []
@@ -159,7 +159,7 @@ def back_project(r_t, img, corners_in_img_arr, corners_in_pcd_arr):
     s2[-1] = S2
 
     cv2.polylines(img, [corners_in_img_arr], 0, (255, 255, 0), L, lineType=16)
-    for i in xrange(corners_in_img_arr.shape[0]):
+    for i in range(corners_in_img_arr.shape[0]):
         cv2.circle(img, tuple(corners_in_img_arr[i].tolist()), s1[i], tuple(c1[i].tolist()), 3)
         cv2.putText(img, str(i + 1), tuple(corners_in_img_arr[i].tolist()), cv2.FONT_HERSHEY_PLAIN, .7,
                     (255, 182, 193), 0)
@@ -181,7 +181,7 @@ def back_project(r_t, img, corners_in_img_arr, corners_in_pcd_arr):
 
 
     cv2.polylines(img, [proj_corners], 0, (0, 255, 255), 1, lineType=16)
-    for i in xrange(proj_corners.shape[0]):
+    for i in range(proj_corners.shape[0]):
         cv2.circle(img, (proj_corners[i][0], proj_corners[i][1]), s2[i], tuple(c2[i].tolist()), 1)
         cv2.putText(img, str(i + 1), (proj_corners[i][0], proj_corners[i][1]), cv2.FONT_HERSHEY_SIMPLEX, .3,
                     (255, 165, 0),0)
@@ -303,7 +303,7 @@ def cal_ext_paras(ind_ls = (np.arange(1, params['poses_num']+1)).tolist()):
     corners_in_pcd_all = np.array([]).reshape(0, 3)
 
     if params['camera_type'] == "panoramic":
-        print "Optimize the extrinsic parameters with panoramic model."
+        print("Optimize the extrinsic parameters with panoramic model.")
         for i in ls:
             imgfile = "img/" + str(i).zfill(params['file_name_digits']) + "." + params['image_format']
             cords_file = "output/img_corners/" + str(i).zfill(params['file_name_digits']) + "_img_corners.txt"
@@ -311,7 +311,7 @@ def cal_ext_paras(ind_ls = (np.arange(1, params['poses_num']+1)).tolist()):
             # make sure the corners are counted start from left lower
             if np.linalg.norm(np.array(corners_in_img_arr[0]) - np.array([0, H])) > np.linalg.norm(
                     np.array(corners_in_img_arr[-1]) - np.array([0, H])):
-                print imgfile + " is counted in reversed order"
+                print(imgfile + " is counted in reversed order")
                 corners_in_img_arr = np.flipud(corners_in_img_arr)
 
             pcd_result_file = "output/pcd_seg/" + str(i).zfill(params['file_name_digits']) + "_pcd_result.pkl"
@@ -341,20 +341,20 @@ def cal_ext_paras(ind_ls = (np.arange(1, params['poses_num']+1)).tolist()):
                                                 method="UPNP")
         except:
             upnp_cost = np.inf
-            print "upnp can not be applied"
+            print("upnp can not be applied")
 
         res = opt_r_t(corners_in_image_all, corners_in_pcd_all, initial_guess=initial_guess,
                       save_backproj=False, )  # initial_guess=initial_guess,
         # res_ls.append(convert2_ang_cm(res.x))
         # pnp_ls.append(initial_guess)
 
-        print "initial guess by UPnP:", initial_guess
-        print
-        print "final extrinsic parameters:"
+        print("initial guess by UPnP: {}".format(initial_guess))
+        print()
+        print("final extrinsic parameters:")
         cal_file_name = time.strftime("%Y%m%d_%H%M%S_cali_result.txt")
         np.savetxt(cal_file_name, res.x, delimiter=',')
-        print "refined by LM : ", res.x, " unit: [rad,rad,rad,m,m,m]. The result is Saved to ", cal_file_name
-        print "unit converted : ", convert2_ang_cm(res.x), "unit: [deg,deg,deg,cm,cm,cm]"
+        print("refined by LM : {} unit: [rad,rad,rad,m,m,m]. The result is Saved to {}".format(res.x, cal_file_name))
+        print("unit converted : {} unit: [deg,deg,deg,cm,cm,cm]".format(convert2_ang_cm(res.x)))
         print
         print
         print
@@ -396,7 +396,7 @@ def cal_ext_paras(ind_ls = (np.arange(1, params['poses_num']+1)).tolist()):
                     'image_format']
                 cv2.imwrite(save_file, ret)
     elif params['camera_type'] == "perspective":
-        print "Optimize the extrinsic parameters with perspective model."
+        print("Optimize the extrinsic parameters with perspective model.")
         for i in ls:
             imgfile = os.path.join(params['base_dir'], "img/") + str(i).zfill(params['file_name_digits']) + "." + \
                       params['image_format']
@@ -406,7 +406,7 @@ def cal_ext_paras(ind_ls = (np.arange(1, params['poses_num']+1)).tolist()):
             # make sure the corners are counted start from left lower
             if np.linalg.norm(np.array(corners_in_img_arr[0]) - np.array([0, H])) > np.linalg.norm(
                     np.array(corners_in_img_arr[-1]) - np.array([0, H])):
-                print imgfile + " is counted in reversed order"
+                print(imgfile + " is counted in reversed order")
                 corners_in_img_arr = np.flipud(corners_in_img_arr)
 
             pcd_result_file = os.path.join(params['base_dir'], "output/pcd_seg/") + str(i).zfill(
@@ -438,21 +438,21 @@ def cal_ext_paras(ind_ls = (np.arange(1, params['poses_num']+1)).tolist()):
         except:
             upnp_cost = np.inf
             initial_guess = np.zeros(6).tolist()
-            print "upnp can not be applied"
+            print("upnp can not be applied")
 
         res = opt_r_t(corners_in_image_all, corners_in_pcd_all, initial_guess=initial_guess,
                       save_backproj=False, )  # initial_guess=initial_guess,
-        print res.cost
+        print(res.cost)
         # res_ls.append(convert2_ang_cm(res.x))
         # pnp_ls.append(initial_guess)
 
-        print "initial guess by UPnP:", initial_guess
+        print("initial guess by UPnP: {}".format(initial_guess))
         print
-        print "final extrinsic parameters:"
+        print("final extrinsic parameters:")
         cal_file_name = os.path.join(params['base_dir'], time.strftime("%Y%m%d_%H%M%S_cali_result.txt"))
         np.savetxt(cal_file_name, res.x, delimiter=',')
-        print "refined by LM : ", res.x, " unit: [rad,rad,rad,m,m,m]. The result is Saved to ", cal_file_name
-        print "unit converted : ", convert2_ang_cm(res.x), "unit: [deg,deg,deg,cm,cm,cm]"
+        print("refined by LM : {} unit: [rad,rad,rad,m,m,m]. The result is Saved to {}".format(res.x, cal_file_name))
+        print("unit converted : {} unit: [deg,deg,deg,cm,cm,cm]".format(convert2_ang_cm(res.x)))
         print
         print
         print

@@ -53,7 +53,7 @@ def draw_one_grd_vtk(ls):  # arr:[a,b,c,d],a:orig, b, point1, c,point 2, d,color
     # color_tup = np.random.randint(1, 255, 3)
 
     color.SetNumberOfTuples(source.GetOutput().GetNumberOfCells())
-    for i in xrange(source.GetOutput().GetNumberOfCells()):
+    for i in range(source.GetOutput().GetNumberOfCells()):
         color_tup = np.array([255, 255, 255]) * ls[3]
         color.InsertTuple(i, color_tup)
 
@@ -80,39 +80,39 @@ def gen_color_tup_for_vis(color_style="intens_rg", xyzi_arr=None):
     color_ls = []
     if color_style == "intens_rg":
         tmp = (xyzi_arr[:, params['intensity_col_ind']] - a) / (b - a) * 255
-        for k in xrange(xyzi_arr.shape[0]):
+        for k in range(xyzi_arr.shape[0]):
             rgb_tuple = np.array([tmp[k], 0, 255 - xyzi_arr[k, params['intensity_col_ind']]]).astype(np.int32)
             color_ls.append(rgb_tuple)
         return color_ls
     elif color_style == "intens":
         tmp = (xyzi_arr[:, params['intensity_col_ind']] - a) / (b - a) * 255
-        for k in xrange(xyzi_arr.shape[0]):
+        for k in range(xyzi_arr.shape[0]):
             rgb_tuple = np.repeat(tmp[k], 3).astype(np.int32)
             color_ls.append(rgb_tuple)
         return color_ls
     elif color_style == "autumn":
         tmp = (xyzi_arr[:, params['intensity_col_ind']] - a).astype(np.float32) / (b - a)
-        for k in xrange(xyzi_arr.shape[0]):
+        for k in range(xyzi_arr.shape[0]):
             rgb_tuple = (np.array(plt.cm.autumn(1 - tmp[k]))[:3] * 255).astype(np.int32)
             color_ls.append(rgb_tuple)
         return color_ls
     elif color_style == "cool":
         tmp = (xyzi_arr[:, params['intensity_col_ind']] - a).astype(np.float32) / (b - a)
-        for k in xrange(xyzi_arr.shape[0]):
+        for k in range(xyzi_arr.shape[0]):
             rgb_tuple = (np.array(plt.cm.cool(tmp[k]))[:3] * 255).astype(np.int32)
             color_ls.append(rgb_tuple)
         return color_ls
     elif color_style == "monochrome":
         # color = (np.random.randint(0, 255, 3)).tolist()
         color = [46, 204, 113]
-        for k in xrange(xyzi_arr.shape[0]):
+        for k in range(xyzi_arr.shape[0]):
             color_ls.append(color)
         return color_ls
     elif color_style == "by_height":
         low_height = xyzi_arr[:, 2].min()
         high_height = xyzi_arr[:, 2].max()
         tmp = 0.0 + 0.7 * (xyzi_arr[:, 2] - low_height) / (high_height - low_height)
-        for k in xrange(xyzi_arr.shape[0]):
+        for k in range(xyzi_arr.shape[0]):
             rgb_tuple = (np.array(plt.cm.hsv(tmp[k]))[:3] * 255).astype(np.int32)
             color_ls.append(rgb_tuple)
         return color_ls
@@ -131,7 +131,7 @@ def vis_3D_points(full_lidar_arr, color_style="intens_rg"):
 
     tuple_ls = gen_color_tup_for_vis(color_style, xyzi_arr=full_lidar_arr)
 
-    for k in xrange(all_rows):
+    for k in range(all_rows):
         point = full_lidar_arr[k, :3]
         id = Points.InsertNextPoint(point[0], point[1], point[2])
         Vertices.InsertNextCell(1)
@@ -171,7 +171,7 @@ def vis_pcd_color_arr(array_data, color_arr=[46, 204, 113]):
     Points = vtk.vtkPoints()
     Vertices = vtk.vtkCellArray()
 
-    for k in xrange(all_rows):
+    for k in range(all_rows):
         point = array_data[k, :]
         id = Points.InsertNextPoint(point[0], point[1], point[2])
         Vertices.InsertNextCell(1)
@@ -298,7 +298,7 @@ def remove_occlusion_of_chessboard(pcd_arr, corners_in_pcd_arr):
 
     polygon_path = mplPath.Path(bound_on_image.tolist())
 
-    for i in xrange(len(pcd_ls)):
+    for i in range(len(pcd_ls)):
         pix = list(reversed(pix_ls[i]))
         # print pix
         if polygon_path.contains_point(pix):
@@ -541,7 +541,7 @@ def vis_ested_pcd_corners(ind=1):
     ren.SetBackground(0.90196079, 0.96078432, 0.59607846)
     # ren.SetBackground(1., 1., 1.)
 
-    for i in xrange(len(trans_grid_ls)):
+    for i in range(len(trans_grid_ls)):
         tmp_actor = draw_one_grd_vtk(trans_grid_ls[i])
         tmp_actor.GetProperty().SetOpacity(0.5)
         ren.AddActor(tmp_actor)
@@ -722,7 +722,7 @@ def back_project_pcd(img, pcd_arr, color_arr, r_t, i, hide_occlussion_by_marker)
     print
     print proj_pts.shape[0], proj_pts.min(axis=0), proj_pts.max(axis=0)
     print
-    for i in xrange(proj_pts.shape[0]):
+    for i in range(proj_pts.shape[0]):
         cv2.circle(img, (proj_pts[i][0], proj_pts[i][1]), point_s, tuple(color_arr[i].tolist()), -1)
 
     return img

@@ -44,11 +44,11 @@ new_arr_ls = []
 
 color_bar = np.random.randint(0, 255, [128, 3])
 
-for m in xrange(laser_beam_num):
+for m in range(laser_beam_num):
     order = np.where(arr[:, 4] == m)  # the 4-th column means the laser id
     temp_data = arr[order[0]][:, :3]  # exact XYZ data with laser_id=i
     temp_point_num = temp_data.shape[0]
-    for p in xrange(temp_point_num):
+    for p in range(temp_point_num):
         color = np.array([int(float(p) / temp_point_num * 255), 0, 255 - int(float(p) / temp_point_num * 255)])
         # print color
         new_arr_ls.append(np.hstack([temp_data[p, :3], color]))
