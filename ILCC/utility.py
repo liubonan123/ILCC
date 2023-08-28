@@ -232,7 +232,7 @@ def vis_with_renderer(renderer):
             else:
                 writer.SetInputData(w2if.GetOutput())
             writer.Write()
-            print "screenshot saved"
+            print("screenshot saved")
 
     style = vtk.vtkInteractorStyleSwitch()
     renderWindowInteractor.SetInteractorStyle(style)
@@ -287,7 +287,7 @@ def remove_occlusion_of_chessboard(pcd_arr, corners_in_pcd_arr):
         inds = np.where(pcd_arr[:, 2] > 0)
         pcd_ls = pcd_arr[inds].tolist()
         pix_ls = np.array(pix_ls)[inds].tolist()
-        print "before removal: ", len(pcd_ls)
+        print("before removal: {}".format(len(pcd_ls)))
         proj_pts = (pcd_to_pix / pcd_to_pix[:, 2].reshape(-1, 1))[:, :2].astype(np.int16)
         bound_on_image = np.fliplr(proj_pts)
         # bound_on_image = proj_pts
@@ -425,7 +425,7 @@ def vis_all_markers(ls=[1]):
                     color_style="intens_rg")
             ren.AddActor(actor2)
         except:
-            print i, "-th pcd corners are not found!"
+            print("{}-th pcd corners are not found!".format(i))
             continue
 
     transform2 = vtk.vtkTransform()
@@ -477,7 +477,7 @@ def vis_all_markers(ls=[1]):
             writer.SetFileName("screenshot.png")
             writer.SetInputData(w2if.GetOutput())
             writer.Write()
-            print "screenshot saved"
+            print("screenshot saved")
 
         # save to pdf
         if iren.GetKeyCode() == "s":
@@ -575,7 +575,7 @@ def vis_ested_pcd_corners(ind=1):
             writer.SetFileName("screenshot.png")
             writer.SetInputData(w2if.GetOutput())
             writer.Write()
-            print "screenshot saved"
+            print("screenshot saved")
 
     style = vtk.vtkInteractorStyleSwitch()
     iren.SetRenderWindow(renWin)
@@ -654,7 +654,7 @@ def back_project_pcd(img, pcd_arr, color_arr, r_t, i, hide_occlussion_by_marker)
 
             # print cam_coord_pcd
 
-            print "before filtering z: ", cam_coord_pcd.shape
+            print("before filtering z: {}".format(cam_coord_pcd.shape))
             # cam_coord_pcd = cam_coord_pcd[np.where(cam_coord_pcd[:, 2] < 0)]
             # cam_coord_pcd = cam_coord_pcd[:20000, :]
             # print cam_coord_pcd
@@ -663,7 +663,7 @@ def back_project_pcd(img, pcd_arr, color_arr, r_t, i, hide_occlussion_by_marker)
             cam_coord_pcd = cam_coord_pcd[inds]
             color_arr = color_arr[inds]
             # print cam_coord_pcd
-            print "after filtering z: ", cam_coord_pcd.shape
+            print("after filtering z: {}".format(cam_coord_pcd.shape))
 
             pcd_to_pix = (np.dot(intrinsic_paras, cam_coord_pcd.T)).T
             # pcd_to_pix = pcd_to_pix[np.where(pcd_to_pix[:, 2] > 0)]
@@ -714,13 +714,13 @@ def back_project_pcd(img, pcd_arr, color_arr, r_t, i, hide_occlussion_by_marker)
 
         # print "before removal: ", transformed_pcd.shape
         inds = remove_occlusion_of_chessboard(transformed_pcd, corners_in_pcd_arr)
-        print "inds:", inds
+        print("inds: {}".format(inds))
         proj_pts = np.array(proj_pcd_2_pix(transformed_pcd))[inds].astype(np.int32)
-        print "after removal: ", proj_pts.shape
+        print("after removal: {}".format(proj_pts.shape))
         color_arr = color_arr[inds]
 
     print
-    print proj_pts.shape[0], proj_pts.min(axis=0), proj_pts.max(axis=0)
+    print(proj_pts.shape[0], proj_pts.min(axis=0), proj_pts.max(axis=0))
     print
     for i in range(proj_pts.shape[0]):
         cv2.circle(img, (proj_pts[i][0], proj_pts[i][1]), point_s, tuple(color_arr[i].tolist()), -1)
@@ -757,10 +757,10 @@ def vis_back_proj(ind=1, img_style="edge", pcd_style="intens", hide_occlussion_b
         warnings.warn("More than one calibration file exit! Load the latest file.", UserWarning)
         latest_cali = find_latest(cali_file_ls)
         r_t = np.genfromtxt(os.path.join(params['base_dir'], latest_cali), delimiter=',')
-        print "Load ", latest_cali, " as the extrinsic calibration parameters!"
+        print("Load {} as the extrinsic calibration parameters!".format(latest_cali))
     elif len(cali_file_ls) == 1:
         r_t = np.genfromtxt(os.path.join(params['base_dir'], cali_file_ls[0]), delimiter=',')
-        print "Load ", cali_file_ls[0], " as the extrinsic calibration parameters!"
+        print("Load as the extrinsic calibration parameters!".format(cali_file_ls[0]))
     else:
         raise Exception("No calibration file is found!")
 
@@ -769,7 +769,7 @@ def vis_back_proj(ind=1, img_style="edge", pcd_style="intens", hide_occlussion_b
     elif pcd_style == "dis":
         pcd_color = np.fliplr((cm.jet(dis_arr / 10) * 255).astype(np.int32)[:, :3])
     else:
-        print "Please input the right pcd color style"
+        print("Please input the right pcd color style")
 
     backproj_img = back_project_pcd(img, pcd, pcd_color, r_t, ind, hide_occlussion_by_marker)
 
@@ -793,14 +793,14 @@ def vis_back_proj(ind=1, img_style="edge", pcd_style="intens", hide_occlussion_b
                                               params["file_name_digits"])) + "_" + img_style + "_" + pcd_style + (
                                  "_hide_occlusion" if hide_occlussion_by_marker else "") + "." + params['image_format']
             cv2.imwrite(save_file_name, img, [cv2.IMWRITE_JPEG_QUALITY, 70])
-            print "The image is saved to ", save_file_name
+            print("The image is saved to ", save_file_name)
             cv2.destroyAllWindows()
     else:
         save_file_name = os.path.join(params['base_dir'], str(ind).zfill(
             params["file_name_digits"])) + "_" + img_style + "_" + pcd_style + (
                              "_hide_occlusion" if hide_occlussion_by_marker else "") + "." + params['image_format']
         cv2.imwrite(save_file_name, img, [cv2.IMWRITE_JPEG_QUALITY, 70])
-        print "The image is saved to ", save_file_name
+        print("The image is saved to ", save_file_name)
         cv2.destroyAllWindows()
 
 
