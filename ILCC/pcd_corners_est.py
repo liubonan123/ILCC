@@ -7,7 +7,7 @@ from scipy import spatial
 import matplotlib.path as mplPath
 import transforms3d
 from scipy.optimize import minimize
-import cPickle
+import _pickle as cPickle
 import os
 from ast import literal_eval as make_tuple
 from multiprocessing import Pool
@@ -244,7 +244,7 @@ class jdc_segments_collection:
 
     def cluster_seg(self):
         clustered_list = list()
-        print("jdc number: {}".foramt(len(self.segs_list)))
+        print("jdc number: {}".format(len(self.segs_list)))
         copy_segs_list = copy.deepcopy(self.segs_list)
         z_list = []
         for segs in copy_segs_list:
@@ -890,9 +890,10 @@ def main_for_pool(i):
         print(result)
         save_file_path = os.path.join(params['base_dir'], "output/pcd_seg/") + str(i).zfill(
             params["file_name_digits"]) + "_pcd_result.pkl"
-        with open(os.path.abspath(save_file_path), 'w') as file:
+        with open(os.path.abspath(save_file_path), 'wb') as file:
             file.truncate()
-            cPickle.dump(result, file)
+            res = str(result)
+            cPickle.dump(res, file)
         print("pkl file was saved to " + save_file_path + " successfully!")
     except AssertionError:
         print("marker cannot be found")

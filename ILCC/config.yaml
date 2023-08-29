@@ -1,8 +1,8 @@
 ###### File path related
-'base_dir': "" #The path of directory including img,pcd,out folders.
+'base_dir': "/home/kai/exp_ws/ILCC_data/ILCC_sample_perspective_data/ILCC_sample_perspective_data" #The path of directory including img,pcd,out folders.
 ###### Parameters for corner detection from images
 'image_res': (4000,8000) #image resolution for panoramic image only
-'backend': 'matlab' #backend of detecting corners from the image, "matlab" or "opencv"
+'backend': 'opencv' #backend of detecting corners from the image, "matlab" or "opencv"
 'output_img_with_dectected_corners': True #output the image with detected corners
 'back_proj_corners': True #back-project the detected corners of the point cloud to the images
 'camera_type': 'perspective' #camera model: 'panoramic' or 'perspective'
@@ -30,6 +30,6 @@
 'intensity_col_ind': 3 # The index of intensity column (counting starts from 0). !!! Wrong number will cause the failure of corner detection in pcd files.
 
 ######### Settings for multi-processing
-'multi_proc': True #Use multiple processing
+'multi_proc': False #Use multiple processing
 'proc_num': 4 #The number of cores to use for multiple processing
 'poses_num': 20 #The number of image-laserscan pairs 

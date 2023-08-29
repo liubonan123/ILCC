@@ -55,6 +55,7 @@ These features are implemented for VLP-16, HDL-32e and HDL-64e. However, they te
     - for Ubuntu:<br> 
     ```sh
     sudo apt-get install libpcl-1.7-all
+    sudo apt-get install python3-pcl
     ```
     or [build from source](http://www.pointclouds.org/documentation/tutorials/compiling_pcl_posix.php)
 * [PCL python bindings](<https://github.com/mfxox/python-pcl>)

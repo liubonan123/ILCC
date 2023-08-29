@@ -8,7 +8,6 @@ import sys
 
 params = config.default_params()
 
-
 # corner detection from one image
 def get_corner_coords(imagefilename, backend=params['backend'], size=make_tuple(params['pattern_size']),
                       show_figure=False, save_figure=params['output_img_with_dectected_corners']):
