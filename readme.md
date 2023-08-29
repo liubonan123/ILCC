@@ -43,6 +43,10 @@ These features are implemented for VLP-16, HDL-32e and HDL-64e. However, they te
     cd opengv
     mkdir build && cd build && cmake .. && make && make install
     ```
+    If OpenGV could not be imported directly after installation, add installation path to `PYTHONPATH`
+    ```
+    export PYTHONPATH=$PYTHONPATH:/usr/local/lib/python3/dist-packages
+    ```
 * [Point Cloud Library (PCL)](http://pointclouds.org/)
     - for macOS:<br> 
     ```sh

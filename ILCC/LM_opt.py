@@ -7,6 +7,9 @@ import cv2
 import os
 import math
 from scipy.optimize import least_squares
+
+import sys
+sys.path.insert(0, "/usr/local/lib/python3/dist-packages")
 import pyopengv
 import time
 import config
