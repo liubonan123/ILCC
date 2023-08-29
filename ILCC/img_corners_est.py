@@ -53,9 +53,9 @@ def get_corner_coords(imagefilename, backend=params['backend'], size=make_tuple(
         img = cv2.imread(imagefilename)
         size=(size[0]-1,size[1]-1)
         print(img.shape)
-
+        print("chessboard patttern size: {}".format(size))
         ret, corners = cv2.findChessboardCorners(img, size,
-                                                 flags=cv2.CALIB_CB_ADAPTIVE_THRESH + cv2.CALIB_CB_NORMALIZE_IMAGE + cv2.CALIB_CB_FAST_CHECK)
+                                                 flags=(cv2.CALIB_CB_ADAPTIVE_THRESH | cv2.CALIB_CB_NORMALIZE_IMAGE | cv2.CALIB_CB_FAST_CHECK))
         print("find chess board corner result: {}".format(ret))
         #flags=cv2.cv.CV_CALIB_CB_ADAPTIVE_THRESH + cv2.cv.CV_CALIB_CB_NORMALIZE_IMAGE + cv2.CALIB_CB_FAST_CHECK
         corners_reshaped=corners.reshape((size[1],size[0],2))
