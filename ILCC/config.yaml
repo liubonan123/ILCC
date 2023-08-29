@@ -13,6 +13,7 @@
 
 ###### Parameters for segmenting the point cloud
 'file_name_digits': 4 #filename format
+'image_format' : 'png'
 'LiDAR_type': 'hdl32' # available choices 'vlp16_puck', 'hdl32', 'hdl64'
 'laser_beams_num': 32 #The number of the laser beams of the Velodyne LiDAR
 'jdc_thre_ratio': 5 #The ratio of adaptive threshold for clustering scanline
@@ -32,4 +33,4 @@
 ######### Settings for multi-processing
 'multi_proc': False #Use multiple processing
 'proc_num': 4 #The number of cores to use for multiple processing
-'poses_num': 20 #The number of image-laserscan pairs 
+'poses_num': 4 #The number of image-laserscan pairs 

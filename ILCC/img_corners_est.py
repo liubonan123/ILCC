@@ -56,6 +56,7 @@ def get_corner_coords(imagefilename, backend=params['backend'], size=make_tuple(
 
         ret, corners = cv2.findChessboardCorners(img, size,
                                                  flags=cv2.CALIB_CB_ADAPTIVE_THRESH + cv2.CALIB_CB_NORMALIZE_IMAGE + cv2.CALIB_CB_FAST_CHECK)
+        print("find chess board corner result: {}".format(ret))
         #flags=cv2.cv.CV_CALIB_CB_ADAPTIVE_THRESH + cv2.cv.CV_CALIB_CB_NORMALIZE_IMAGE + cv2.CALIB_CB_FAST_CHECK
         corners_reshaped=corners.reshape((size[1],size[0],2))
         corners_reshaped=np.flip(corners_reshaped,1)
@@ -99,8 +100,10 @@ def detect_img_corners():
             # print corner_points
             save_points_filename = img_corner_path + str(i).zfill(
                 params['file_name_digits']) + "_img_corners" + ".txt"
+            print("saving corner points to {}".format(save_points_filename))
             np.savetxt(save_points_filename, np.squeeze(corner_points), delimiter=",")
-        except:
+        except Exception as e:
+            print(e)
             continue
 
 
