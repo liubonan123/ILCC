@@ -6,7 +6,8 @@
 'output_img_with_dectected_corners': True #output the image with detected corners
 'back_proj_corners': True #back-project the detected corners of the point cloud to the images
 'camera_type': 'perspective' #camera model: 'panoramic' or 'perspective'
-'instrinsic_para': (166.87739756, 0., 311.29512622,  0., 334.91696616, 781.89612824,   0., 0., 1.)
+# 'instrinsic_para': (166.87739756, 0., 311.29512622,  0., 334.91696616, 781.89612824,   0., 0., 1.)
+'instrinsic_para': (868.8635490484858, 0., 628.330423069096,  0., 868.0311663425184, 494.37365713982456,   0., 0., 1.)
 # intrinsic parameters are necessary for perspective cameras (1,2,3,4,5,6,7,8,9)→　[1,2,3
 #                                                                                   4,5,6
 #                                                                                   7,8,9]
@@ -18,7 +19,6 @@
 'laser_beams_num': 32 #The number of the laser beams of the Velodyne LiDAR
 'jdc_thre_ratio': 5 #The ratio of adaptive threshold for clustering scanline
 'agglomerative_cluster_th_ratio': 5 #The ratio of adaptive threshold for combining the scanline cluters
-
 
 ######### Parameters for detecting chessboard from segmentation result
 'pattern_size': (6,8)  #number of vertical and horizontal patterns
