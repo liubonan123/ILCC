@@ -7,6 +7,7 @@ import shutil
 import sys
 
 params = config.default_params()
+print(params['camera_type'])
 
 # corner detection from one image
 def get_corner_coords(imagefilename, backend=params['backend'], size=make_tuple(params['pattern_size']),
@@ -84,29 +85,40 @@ def get_corner_coords(imagefilename, backend=params['backend'], size=make_tuple(
 
 #
 def detect_img_corners():
-    ls = np.arange(1,params['poses_num']+1).tolist()
+    ls = np.arange(0,params['poses_num']).tolist()
+    print(ls)
     # ls = [20]
     img_corner_path = os.path.join(params['base_dir'], "output/img_corners/")
     if os.path.isdir(img_corner_path):
         shutil.rmtree(img_corner_path)
     os.makedirs(img_corner_path)
+    print("n digits: {}".format(params["file_name_digits"]))
+    print("image format: {}".format(params["image_format"]))
+    print("camera type: {}".format(params["camera_type"]))
+    print("intrinsic: {}".format(params["instrinsic_para"]))
+    corners_all = None
     for i in ls:
         try:
             imagefilename = os.path.join(params['base_dir'],
-                                         "img", str(i).zfill(params['file_name_digits']) + "." + params['image_format'])
+                                         "img", str(i).zfill(params['file_name_digits']) + "." + str(params['image_format']))
             print(imagefilename)
             corner_points = get_corner_coords(imagefilename)
-
+            
             # print corner_points
-            save_points_filename = img_corner_path + str(i).zfill(
+            save_points_filename = str(img_corner_path) + str(i).zfill(
                 params['file_name_digits']) + "_img_corners" + ".txt"
             print("saving corner points to {}".format(save_points_filename))
             np.savetxt(save_points_filename, np.squeeze(corner_points), delimiter=",")
+
+            if corners_all is None:
+                corners_all = np.squeeze(corner_points)
+                continue
+            corners_all = np.concatenate((corners_all, np.squeeze(corner_points)), axis=0)
+
         except Exception as e:
             print(e)
             continue
-
-
+    np.savetxt("/home/kai/rosbags/nv_ext_calib/output/img_corners/img_corners_all.txt", corners_all, delimiter=" ")
 
 if __name__ == '__main__':
     detect_img_corners()

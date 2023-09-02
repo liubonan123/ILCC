@@ -1,5 +1,6 @@
 # coding=utf-8
 import _pickle as cPickle
+import pickle
 from scipy.optimize import minimize, root
 import numpy as np
 import transforms3d
@@ -212,6 +213,7 @@ def cost_func(r_t, corners_in_pcd_arr,
               corners_in_img_arr):  
 
     transformed_pcd = roate_with_rt(r_t, corners_in_pcd_arr)
+    # print(transformed_pcd)
 
     if params['camera_type'] == "panoramic":
         transformed_pcd_ls = transformed_pcd.tolist()
@@ -235,7 +237,7 @@ def cost_func(r_t, corners_in_pcd_arr,
         pcd_to_pix = (np.dot(intrinsic_paras, cam_coord_pcd.T)).T
         pcd_to_pix = pcd_to_pix / pcd_to_pix[:, 2].reshape(-1, 1)
 
-        num = corners_in_pcd_arr.shape[0]
+        num = corners_in_img_arr.shape[0]
         ls = []
         for i in range(0, num):
             r_cost = abs(pcd_to_pix[i][0] - corners_in_img_arr[i][0])
@@ -282,7 +284,8 @@ def opt_r_t(corners_in_img_arr, corners_in_pcd_arr, initial_guess=np.zeros(6).to
         pcd_ls_arr = np.array(pcd_ls)
 
     args = (corners_in_pcd_arr, corners_in_img_arr)
-
+    print("corners_in_pcd_arr shape: {}".format(corners_in_pcd_arr.shape))
+    print("corners_in_img_arr shape: {}".format(corners_in_img_arr.shape))
     res = run_min(args, initial_guess)  # , initial_guess=(np.random.random(6) * 1.5).tolist()
 
     if save_backproj:
@@ -295,7 +298,7 @@ def opt_r_t(corners_in_img_arr, corners_in_pcd_arr, initial_guess=np.zeros(6).to
     return res
 
 
-def cal_ext_paras(ind_ls = (np.arange(1, params['poses_num']+1)).tolist()):
+def cal_ext_paras(ind_ls = (np.arange(0, params['poses_num'])).tolist()):
     #ind_ls: Indexes of pairs used for optimization
 	
     ls = ind_ls
@@ -414,16 +417,22 @@ def cal_ext_paras(ind_ls = (np.arange(1, params['poses_num']+1)).tolist()):
 
             pcd_result_file = os.path.join(params['base_dir'], "output/pcd_seg/") + str(i).zfill(
                 params['file_name_digits']) + "_pcd_result.pkl"
+            
             # print imgfile
-            with open(os.path.abspath(pcd_result_file), "r") as f:
-                pcd_result_ls = cPickle.load(f)
+            print(pcd_result_file)
+            with open(pcd_result_file, "rb") as f:
+                pcd_result_ls = pickle.load(f)
+                # try:
+                #     pcd_result_ls = cPickle.load(f)
+                # except UnicodeDecodeError as e:
+                #     pcd_result_ls = cPickle.decode(f)
             assert pcd_result_ls is not None
-
+            # print("pcd_result_ls shape: {}".format(pcd_result_ls.shape))
             corner_arr = pcd_result_ls[4].reshape(-1, 2)
 
             num = corner_arr.shape[0]
             corner_arr = np.hstack([corner_arr, np.zeros(num).reshape(num, 1)])
-            # print corner_arr.shape
+            print("corner_arr shape: {}".format(corner_arr.shape))
             rot1 = pcd_result_ls[0]
             t1 = pcd_result_ls[1].reshape(1, 3)
             rot2 = pcd_result_ls[2]
@@ -433,7 +442,8 @@ def cal_ext_paras(ind_ls = (np.arange(1, params['poses_num']+1)).tolist()):
 
             corners_in_image_all = np.vstack([corners_in_image_all, corners_in_img_arr])
             corners_in_pcd_all = np.vstack([corners_in_pcd_all, corners_in_pcd_arr])
-        # print "corners_in_pcd_all num of rows: ", corners_in_pcd_all.shape
+        print("corners_in_image_all num of rows: ", corners_in_image_all.shape)
+        print("corners_in_pcd_all num of rows: ", corners_in_pcd_all.shape)
 
         try:
             initial_guess = calc_inintial_guess(corners_in_image_all.copy(), corners_in_pcd_all.copy(),
@@ -479,9 +489,9 @@ def cal_ext_paras(ind_ls = (np.arange(1, params['poses_num']+1)).tolist()):
 
                 pcd_result_file = os.path.join(params['base_dir'], "output/pcd_seg/") + str(i).zfill(
                     params['file_name_digits']) + "_pcd_result.pkl"
-                # print imgfile
-                with open(os.path.abspath(pcd_result_file), "r") as f:
-                    pcd_result_ls = cPickle.load(f)
+                print("pcd_result_file: {}".format(pcd_result_file))
+                with open(pcd_result_file, "rb") as f:
+                    pcd_result_ls = pickle.load(f)
                 assert pcd_result_ls is not None
 
                 corner_arr = pcd_result_ls[4].reshape(-1, 2)

@@ -1,5 +1,5 @@
 ###### File path related
-'base_dir': "/home/kai/exp_ws/ILCC_data/ILCC_sample_perspective_data/ILCC_sample_perspective_data" #The path of directory including img,pcd,out folders.
+'base_dir': "/home/kai/rosbags/nv_ext_calib" #The path of directory including img,pcd,out folders.
 ###### Parameters for corner detection from images
 'image_res': (4000,8000) #image resolution for panoramic image only
 'backend': 'opencv' #backend of detecting corners from the image, "matlab" or "opencv"
@@ -13,7 +13,7 @@
 #                                                                                   7,8,9]
 
 ###### Parameters for segmenting the point cloud
-'file_name_digits': 4 #filename format
+'file_name_digits': 1 #filename format
 'image_format' : 'png'
 'LiDAR_type': 'hdl32' # available choices 'vlp16_puck', 'hdl32', 'hdl64'
 'laser_beams_num': 32 #The number of the laser beams of the Velodyne LiDAR
@@ -21,7 +21,7 @@
 'agglomerative_cluster_th_ratio': 5 #The ratio of adaptive threshold for combining the scanline cluters
 
 ######### Parameters for detecting chessboard from segmentation result
-'pattern_size': (6,8)  #number of vertical and horizontal patterns
+'pattern_size': (7,9)  #number of vertical and horizontal patterns
 'grid_length': 0.075 #the length of one grid of the pattern [m]
 'chessboard_detect_planar_PCA_ratio': 0.01 # The threshold of the planarity check of the potential chessboard with PCA
 'marker_range_limit': 5 #The farthest range of the chessboard for filtering irrelative segments. Segments whose centroid to Velodyne farther that this threshold will not be considered as a potential chessboard.
@@ -33,4 +33,4 @@
 ######### Settings for multi-processing
 'multi_proc': False #Use multiple processing
 'proc_num': 4 #The number of cores to use for multiple processing
-'poses_num': 4 #The number of image-laserscan pairs 
+'poses_num': 5 #The number of image-laserscan pairs 

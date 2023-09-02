@@ -8,8 +8,19 @@ import open3d as o3d
 
 import _pickle as cPickle
 
+import pickle
+
 import time
 
+import rosbag
+from sensor_msgs.msg import PointCloud2
+
+from pathlib import Path
+import sys
+
+ros_numpy_path = Path().cwd().parent.joinpath("scripts").joinpath("ros_numpy")
+sys.path.append(ros_numpy_path.as_posix())
+import point_cloud2
 
 def read_csv_point_cloud(csvfile: str) -> Tuple[np.array, np.array]:
 
@@ -20,6 +31,23 @@ def read_csv_point_cloud(csvfile: str) -> Tuple[np.array, np.array]:
 
     ## return coordinates and intensity
     return xyz, intensity#rgb
+
+def read_rosbag_point_cloud(bag_dir: str, topic_name: str) -> Tuple[np.array, np.array]:
+    # Supports PointCloud2
+    bag = rosbag.Bag(bag_dir)
+    xyz = []
+    intensity = []
+    for topic, msg, t in bag.read_messages(topic_name):
+        if(topic == topic_name):
+            for i in range(msg.width):
+                point_begin_idx = i * msg.point_step
+                x = np.frombuffer(msg.data[point_begin_idx : point_begin_idx+4], dtype=np.float32)[0]
+                y = np.frombuffer(msg.data[point_begin_idx+4 : point_begin_idx+8], dtype=np.float32)[0]
+                z = np.frombuffer(msg.data[point_begin_idx+8 : point_begin_idx+12], dtype=np.float32)[0]
+                b = np.frombuffer(msg.data[point_begin_idx+12 : point_begin_idx+16], dtype=np.float32)[0]
+                xyz.append([x, y, z])
+                intensity.append([b])
+    return np.array(xyz), np.array(intensity)
 
 def np_to_gpu(np_arr):
     np_arr = np.array(np_arr)
@@ -173,7 +201,7 @@ def find_chessboard(image):
 
     # gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     # Detect the calibration board
-    pattern_size = (8, 6)  # Number of inner corners on the board
+    pattern_size = (6, 8)  # Number of inner corners on the board
     found, corners = cv2.findChessboardCorners(gray, pattern_size, None)
 
     print('found: ',found)
@@ -226,7 +254,7 @@ def find_chessboard(image):
 def save_xyz2pcd(xyz,base_dir):
     pcl = o3d.geometry.PointCloud()
     pcl.points = o3d.utility.Vector3dVector(xyz)
-    o3d.io.write_point_cloud(base_dir + "/output/pcd_seg/" + str(file_index) + '_vis.pcd',pcl)
+    o3d.io.write_point_cloud(base_dir + "/output/pcd_seg/" + file_index + '_vis.pcd',pcl)
 
 def save_xyz2pkl(xyz):
 
@@ -238,47 +266,46 @@ def save_xyz2pkl(xyz):
     t1 = np.zeros(3)
     t2 = np.zeros(3)
     result = [rot1, t1, rot2, t2, corner_arr, "res.x", "os.path.relpath(marker_pkl[0])"]
-    save_file_path = os.path.join(base_dir, "output/pcd_seg/") + str(i) + "_pcd_result.pkl"
+    save_file_path = os.path.join(base_dir, "output/pcd_seg/") + file_index + "_pcd_result.pkl"
     print('save_file_path: ',save_file_path)
     with open(os.path.abspath(save_file_path), 'wb') as file:
-        file.truncate()
-        cPickle.dump(result, file, protocol=2)
+        # file.truncate()
+        pickle.dump(result, file)
 
 if __name__ == "__main__":
 
     ## set parameters
     parser = argparse.ArgumentParser()
-    parser.add_argument('--dataset_path', type=str, default="fisheyes_image_dataset")
+    parser.add_argument('--dataset_path', type=str, default="/home/kai/rosbags/nv_ext_calib/")
     args = parser.parse_args()
     
     base_dir = args.dataset_path
 
     # resolution = (int(3040/3), int(6080/3))
     resolution = (3040, 6080)
-    csv_base_path = os.path.join(args.dataset_path, "pcd")
+    pc_base_path = os.path.join(args.dataset_path, "bags")
 
     ## load path and filenames
-    filelist__  = os.listdir(csv_base_path)
+    filelist__  = os.listdir(pc_base_path)
     filelist__.sort()
     print('filelist__: ', filelist__)
-
+    # sys.exit()
     ## loop
+    corners_all = None
     for j in range(len(filelist__)):
 
         ## read file, get xyz, intensity
         # csv_file = filelist__[i]
-        i = j + 1
-        file_index = str(i)
+        file_index = str(j)
         csv_file = file_index  + '.csv'
         save_img_name = csv_file[:-3] + 'jpg'
-
-        print('i: ',i)
         print('j: ',j)
 
         print('csv_file: ',csv_file)
         print('save_img_name: ',save_img_name)
 
-        xyz_np, rgb_np = read_csv_point_cloud(os.path.join(csv_base_path, csv_file))
+        # xyz_np, rgb_np = read_csv_point_cloud(os.path.join(csv_base_path, csv_file))
+        xyz_np, rgb_np = read_rosbag_point_cloud("/home/kai/rosbags/nv_ext_calib/bags/{}.bag".format(j), "/livox/lidar")
         print('1')
         ## push to gpu memory
         xyz_gpu = np_to_gpu(xyz_np)
@@ -286,7 +313,7 @@ if __name__ == "__main__":
         print('1')
 
         ## rearrange in ascending dist
-        xyz_gpu_ascending, rgb_gpu_ascending,dist_ascending = rearrange_in_order(xyz_gpu,rgb_gpu)
+        xyz_gpu_ascending, rgb_gpu_ascending, dist_ascending = rearrange_in_order(xyz_gpu,rgb_gpu)
 
         ##  transform to pixel and depth
         pixel_coor_ascending = get_pixel(xyz_gpu_ascending)
@@ -303,16 +330,19 @@ if __name__ == "__main__":
         # img_depth = make_pano_img_from_data(pixel_coor_ascending,rgb_gpu_ascending,resolution,kernel_size = 7)
 
         # cv2.imwrite(args.dataset_path + "/intensity_img/" + str(i + 1) + ".jpg", img_depth_intensity[:,:,1])
-        cv2.imwrite(args.dataset_path + "/intensity_img/" + save_img_name, img_intensity)
+        save_image_dir = args.dataset_path + "intensity_img/intensity_{}.jpg".format(j)
+        print(save_image_dir)
+        cv2.imwrite(save_image_dir, img_intensity)
 
         print('2')
-
-        intensity_image = cv2.imread(args.dataset_path + "/intensity_img/" + save_img_name)
-
+        
+        intensity_image = cv2.imread(save_image_dir)
+        # resolution = [intensity_image.shape[0], intensity_image.shape[1]]
+        print("loaded intensity image resloution: {}".format(resolution))
+        
         ## detect board corners
         found, corners = find_chessboard(intensity_image)
-        print('2')
-
+        
         ## if found, get depth
         if found:
             corners = np.round(np.array(corners).reshape(-1,2),0).astype(int)
@@ -333,11 +363,9 @@ if __name__ == "__main__":
 
             print('min(corners_depth_ls)',min(corners_depth_ls))
 
-
             ## transform phi,theta,depth to xyz
             xyz_res = xyz_from_pixel_and_depth(corners,corners_depth_ls)
-
-
+            
 
             ## save corners in pkl
             save_xyz2pkl(xyz_res)
@@ -345,11 +373,18 @@ if __name__ == "__main__":
             ## save corners in xyz
             save_xyz2pcd(xyz_res, base_dir)
 
+            # Save corner xyz to txt
+            if corners_all is None:
+                print("first iteration, no concatenate")
+                corners_all = xyz_res.copy()
+                continue
+            corners_all = np.concatenate((corners_all, xyz_res), axis=0)
+            print("{} th iteration corners_all shape: {}".format(j, corners_all.shape))
+            
         else:
             print('No board detected for ',csv_file)
-
-
-        # break
+    print("all corners dims: {}".format(corners_all.shape))
+    np.savetxt("{}output/pc_corners/pc_corners_all.txt".format(base_dir, j), corners_all, delimiter=' ')
 
 
 
